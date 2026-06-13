@@ -1,7 +1,139 @@
-<h2>Mój Portfel (Zalogowany)</h2>
-<p>Hello</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Portfela</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'wallet/css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
 
-<form method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button type="submit">Wyloguj się</button>
-</form>
+    <div class="section flex-container">
+        <h2>Panel Portfela Inwestycyjnego</h2>
+        <div>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Wyloguj się</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="stats-grid">
+            <div class="stat-item">Dostępna gotówka: <strong>{{ profile.cash_balance_pln|floatformat:2 }} PLN</strong></div>
+            <div class="stat-item">Wartość inwestycji: <strong>{{ current_total_investments_value|floatformat:2 }} PLN</strong></div>
+            <div class="stat-item">Zysk / Strata: <strong>{{ profit_loss|floatformat:2 }} PLN</strong></div>
+        </div>
+
+        <form method="post" style="display: flex; gap: 10px; align-items: center;">
+            {% csrf_token %}
+            <input type="number" name="funds_amount" placeholder="Kwota PLN" min="1" required>
+            <button type="submit" name="add_funds">Dodaj środki</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <div class="flex-container">
+            <h3>Struktura portfela</h3>
+            <div style="display: flex; gap: 10px;">
+                <a href="{% url 'invest_page' %}" class="btn btn-primary">Nowa inwestycja</a>
+                <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" name="refresh_prices">Odśwież kursy</button>
+                </form>
+            </div>
+        </div>
+
+        {% if portfolio_summary %}
+            <div class="portfolio-layout">
+                <div class="chart-box">
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+                <div>
+                    <ul class="portfolio-list">
+                        {% for item in portfolio_summary %}
+                            <li class="portfolio-item">
+                                <span class="color-dot" style="background-color: {{ item.color }};"></span>
+                                <strong>{{ item.asset.name }} ({{ item.asset.symbol }})</strong>: 
+                                {{ item.percentage }}% | Wartość: {{ item.current_value_pln|floatformat:2 }} PLN 
+                                (Ilość: {{ item.quantity|floatformat:4 }})
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% else %}
+            <p>Twój portfel jest pusty.</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h3>Historia operacji</h3>
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Waluta</th>
+                    <th>Wartość przy zakupie (PLN)</th>
+                    <th>Wartość teraz (PLN)</th>
+                    <th>Zysk/Strata</th>
+                    <th>Kurs zakupu</th>
+                    <th>Ilość jednostek</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tx in transactions %}
+                <tr>
+                    <td>{{ tx.date|date:"Y-m-d H:i" }}</td>
+                    <td>{{ tx.asset.name }} ({{ tx.asset.symbol }})</td>
+                    <td>{{ tx.amount_in_pln }} PLN</td>
+                    <td>{{ tx.current_value_pln|floatformat:2 }} PLN</td>
+                    <td style="color: {% if tx.profit_loss >= 0 %}green{% else %}red{% endif %}"> 
+                        {{ tx.profit_loss|floatformat:2 }} PLN
+                    </td>
+                    <td>{{ tx.price_per_unit }} PLN</td>
+                    <td>{{ tx.calculated_quantity|floatformat:6 }}</td>
+                    <td>
+                        <a href="{% url 'delete_transaction' tx.id %}" onclick="return confirm('Sprzedać tę inwestycję?');" class="delete-action">
+                            Sprzedaj
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">Brak transakcji w historii.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        {% if chart_labels %}
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    data: {{ chart_data }},
+                    backgroundColor: {{ chart_colors|safe }}
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,18 +1,30 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Rejestracja</title>
+    <title>Zarejestruj się</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'wallet/css/styles.css' %}">
 </head>
 <body>
-    <h2>Stwórz nowe konto użytkownika</h2>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Zarejestruj się</button>
-    </form>
+    <div class="section">
+        <h2>Rejestracja</h2>
+    </div>
 
-    <p>Masz już konto? <a href="{% url 'login' %}">Zaloguj się tutaj</a></p>
+    <div class="section">
+        <form method="post" class="simple-form">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+            
+            <div class="form-actions">
+                <button type="submit">Zarejestruj się</button>
+                <a href="{% url 'login' %}">Masz już konto?</a>
+            </div>
+        </form>
+    </div>
+
 </body>
 </html>

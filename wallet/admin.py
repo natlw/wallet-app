@@ -1,14 +1,10 @@
 from django.contrib import admin
-from .models import Asset, WalletTransaction, AssetCache
+from .models import Asset, WalletTransaction, AssetCache, UserProfile
 
 
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):
-    # kolumny
     list_display = ("name", "symbol", "asset_type", "api_id")
-    # filtry
-    list_filter = ("asset_type",)
-    # wyszukiwanie
     search_fields = ("name", "symbol")
 
 
@@ -17,15 +13,19 @@ class WalletTransactionAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "asset",
-        "transaction_type",
-        "quantity",
+        "amount_in_pln",
+        "calculated_quantity",
         "price_per_unit",
         "date",
     )
-    list_filter = ("transaction_type", "date", "asset")
-    search_fields = ("user__username", "asset__name")
+    list_filter = ("asset", "date")
 
 
 @admin.register(AssetCache)
 class AssetCacheAdmin(admin.ModelAdmin):
     list_display = ("asset", "price_pln", "last_updated")
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user", "cash_balance_pln")

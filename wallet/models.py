@@ -3,74 +3,47 @@ from django.contrib.auth.models import User
 
 
 class Asset(models.Model):
-    ASSET_TYPES = [
+    ASSET_TYPES = (
         ("CRYPTO", "Kryptowaluta"),
-        ("FIAT", "Waluta tradycyjna (FIAT)"),
-    ]
-
-    name = models.CharField(
-        max_length=100, verbose_name="Pełna nazwa (np. Bitcoin, Dolar)"
+        ("FIAT", "Waluta tradycyjna"),
     )
-    symbol = models.CharField(
-        max_length=10, unique=True, verbose_name="Skrót / Symbol (np. BTC, USD)"
-    )
-    asset_type = models.CharField(
-        max_length=10,
-        choices=ASSET_TYPES,
-        default="CRYPTO",
-        verbose_name="Rodzaj waluty",
-    )
-    api_id = models.CharField(
-        max_length=100, blank=True, null=True, verbose_name="ID w API (np. bitcoin)"
-    )
+    name = models.CharField(max_length=50)
+    symbol = models.CharField(max_length=10, unique=True)
+    asset_type = models.CharField(max_length=10, choices=ASSET_TYPES)
+    api_id = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} ({self.symbol})"
 
 
 class WalletTransaction(models.Model):
-    TRANSACTION_TYPES = [
-        ("BUY", "Kupno"),
-        ("SELL", "Sprzedaż"),
-    ]
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="transactions",
-        verbose_name="Użytkownik",
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    amount_in_pln = models.DecimalField(max_digits=20, decimal_places=2)
+    calculated_quantity = models.DecimalField(
+        max_digits=20, decimal_places=8, default=0.0
     )
-    asset = models.ForeignKey(
-        Asset,
-        on_delete=models.CASCADE,
-        related_name="transactions",
-        verbose_name="Wybrana waluta",
-    )
-    transaction_type = models.CharField(
-        max_length=4, choices=TRANSACTION_TYPES, verbose_name="Typ operacji"
-    )
-    quantity = models.DecimalField(
-        max_digits=18, decimal_places=8, verbose_name="Ilość (ile sztuk)"
-    )
-    price_per_unit = models.DecimalField(
-        max_digits=14, decimal_places=4, verbose_name="Cena za 1 sztukę (w PLN)"
-    )
-    date = models.DateTimeField(verbose_name="Data i czas")
+    price_per_unit = models.DecimalField(max_digits=20, decimal_places=4)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.transaction_type} {self.quantity} {self.asset.symbol}"
+        return f"{self.user.username} - {self.asset.symbol} za {self.amount_in_pln} PLN"
 
 
 class AssetCache(models.Model):
-    asset = models.OneToOneField(
-        Asset, on_delete=models.CASCADE, primary_key=True, verbose_name="Waluta"
-    )
-    price_pln = models.DecimalField(
-        max_digits=14, decimal_places=4, verbose_name="Aktualny kurs w PLN"
-    )
-    last_updated = models.DateTimeField(
-        auto_now=True, verbose_name="Ostatnia aktualizacja kursu"
+    asset = models.OneToOneField(Asset, on_delete=models.CASCADE)
+    price_pln = models.DecimalField(max_digits=20, decimal_places=4)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Cache {self.asset.symbol}: {self.price_pln} PLN"
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    cash_balance_pln = models.DecimalField(
+        max_digits=20, decimal_places=2, default=0.00
     )
 
     def __str__(self):
-        return f"Kurs {self.asset.symbol}: {self.price_pln} PLN (Aktualizacja: {self.last_updated})"
+        return f"Profil: {self.user.username} (Gotówka: {self.cash_balance_pln} PLN)"

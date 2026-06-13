@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Nowa Inwestycja</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'wallet/css/styles.css' %}">
+</head>
+<body>
+
+    <div class="section flex-container">
+        <h2>Dodaj nową inwestycję</h2>
+        <a href="{% url 'wallet_dashboard' %}" class="btn">Powrót do panelu</a>
+    </div>
+
+    <div class="section">
+        {% if messages %}
+            {% for message in messages %}
+                <p style="color: #dc3545; font-weight: bold; margin-bottom: 15px;">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        <form method="post" class="simple-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="asset_symbol">Wybierz walutę:</label>
+                <select name="asset_symbol" id="asset_symbol" required>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="USD">Dolar amerykański (USD)</option>
+                    <option value="CHF">Frank szwajcarski (CHF)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="amount_pln">Kwota do zainwestowania (PLN):</label>
+                <input type="number" name="amount_pln" id="amount_pln" placeholder="np. 200" min="1" step="0.01" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Kup walutę</button>
+                <a href="{% url 'wallet_dashboard' %}" class="cancel-action">Anuluj</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
