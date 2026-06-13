@@ -1,0 +1,7 @@
+<h2>Mój Portfel (Zalogowany)</h2>
+<p>Hello</p>
+
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Wyloguj się</button>
+</form>

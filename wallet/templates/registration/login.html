@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie - Crypto Wallet</title>
+</head>
+<body>
+    <h2>Zaloguj się do swojego portfela</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Zaloguj się</button>
+    </form>
+    
+    <p>Nie masz jeszcze konta? <a href="{% url 'register' %}">Zarejestruj się tutaj</a></p>
+</body>
+</html>

@@ -120,3 +120,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+# gdzie przekierować zalogowaniu
+LOGIN_REDIRECT_URL = "wallet_dashboard"
+# gdzie przekierować po wylogowaniu
+LOGOUT_REDIRECT_URL = "login"
+# gdzie przekierować niezalogowanego
+LOGIN_URL = "login"
