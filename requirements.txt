@@ -5,8 +5,10 @@ coverage==7.14.1
 dj-database-url==3.1.2
 Django==5.0.14
 flake8==7.3.0
+gunicorn==26.0.0
 idna==3.18
 mccabe==0.7.0
+packaging==26.2
 psycopg2-binary==2.9.12
 pycodestyle==2.14.0
 pyflakes==3.4.0
