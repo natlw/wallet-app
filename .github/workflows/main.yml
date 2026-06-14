@@ -52,4 +52,4 @@ jobs:
         run: sleep 60
 
       - name: Sanity check deployed application
-        run: curl -f https://wallet-app-30ib.onrender.com/dashboard/
+        run: curl -f https://wallet-app-30ib.onrender.com/login/
