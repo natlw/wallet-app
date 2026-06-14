@@ -2,9 +2,14 @@ asgiref==3.11.1
 certifi==2026.5.20
 charset-normalizer==3.4.7
 coverage==7.14.1
+dj-database-url==3.1.2
 Django==5.0.14
+flake8==7.3.0
 idna==3.18
+mccabe==0.7.0
 psycopg2-binary==2.9.12
+pycodestyle==2.14.0
+pyflakes==3.4.0
 python-dotenv==1.2.2
 requests==2.34.2
 sqlparse==0.5.5
